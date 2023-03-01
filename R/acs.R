@@ -1,6 +1,6 @@
 get_data <- function(root_dir, year, horizon, survey,
-                     states = NULL, density = 1.0,
-                     random_seed = 0, join_household = FALSE,
+                     states = NULL, join_household = FALSE,
+                     # density = 1.0, random_seed = 0,
                      download = FALSE) {
 
   data <- load_acs(
@@ -9,8 +9,8 @@ get_data <- function(root_dir, year, horizon, survey,
     states      = states,
     horizon     = horizon,
     survey      = survey,
-    density     = density,
-    random_seed = random_seed,
+    # density     = density,
+    # random_seed = random_seed,
     download    = download
   )
 

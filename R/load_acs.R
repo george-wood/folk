@@ -42,13 +42,13 @@ load_acs <- function(root_dir = "data",
     cli::cli_abort("`year` must be >= 2014")
   }
 
-  # if (!is.null(serial_filter_list)) {
-  #   serial_filter_list <- unique(serial_filter_list)
-  # }
-
   if (is.null(states)) {
     states <- hash::keys(state_dictionary)
   }
+
+  # if (!is.null(serial_filter_list)) {
+  #   serial_filter_list <- unique(serial_filter_list)
+  # }
 
   # set.seed(random_seed)
 
