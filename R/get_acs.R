@@ -1,4 +1,4 @@
-ua <- user_agent("http://github.com/george-wood/folk")
+ua <- httr::user_agent("http://github.com/george-wood/folk")
 
 #' @importFrom glue glue
 get_acs <- function(year,
@@ -13,7 +13,7 @@ get_acs <- function(year,
     stop("Invalid `year`. Must be >= 2014.")
   }
 
-  if (is.null(states)) {
+  if (is.null(state)) {
     stop("Must provide `state`.")
   }
 
@@ -25,7 +25,7 @@ get_acs <- function(year,
     stop("Invalid `survey`. Must be 'person' or 'household'.")
   }
 
-  url <- modify_url(
+  url <- httr::modify_url(
     url = "https://www2.census.gov/",
     path = glue(
       "programs-surveys/acs/data/pums/",
@@ -33,32 +33,30 @@ get_acs <- function(year,
     )
   )
 
-  resp <- GET(url)
+  resp <- httr::GET(url)
 
-  if (http_type(resp) != "application/zip") {
+  if (httr::http_type(resp) != "application/zip") {
     stop("API did not return zip")
   }
 
-  if (http_error(resp)) {
+  if (httr::http_error(resp)) {
     stop(
       sprintf(
         "ACS API request failed [%s]\n%s\n<%s>",
-        status_code(resp),
-        parsed$message,
-        parsed$documentation_url
+        httr::status_code(resp)
       ),
       call. = FALSE
     )
   }
 
   tmp <- tempfile()
-  GET(
+  httr::GET(
     url,
     ua,
-    write_disk(tmp, overwrite = TRUE),
-    progress()
+    httr::write_disk(tmp, overwrite = TRUE),
+    httr::progress()
   )
-  unzip(zipfile = tmp, exdir = path)
+  utils::unzip(zipfile = tmp, exdir = path)
   unlink(tmp)
 
 }

@@ -18,4 +18,5 @@ Imports:
     data.table,
     glue,
     hash,
+    httr,
     utils
