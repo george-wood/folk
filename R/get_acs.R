@@ -1,6 +1,4 @@
-ua <- httr::user_agent("http://github.com/george-wood/folk")
-
-fetch_acs <- function(path, state, year, period = 1, survey = "p") {
+fetch_acs <- function(path, state, year, period, survey) {
 
   filename <- create_filename(year, survey, state)
 
@@ -17,23 +15,19 @@ fetch_acs <- function(path, state, year, period = 1, survey = "p") {
   resp <- httr::GET(url)
 
   if (httr::http_type(resp) != "application/zip") {
-    stop("API did not return zip")
+    cli::cli_abort("API did not return zip")
   }
 
   if (httr::http_error(resp)) {
-    stop(
-      sprintf(
-        "ACS API request failed: [%s]",
-        httr::status_code(resp)
-      ),
-      call. = FALSE
+    cli::cli_abort(
+      "ACS API request failed: {httr::status_code(resp)}"
     )
   }
 
   tmp <- tempfile()
   httr::GET(
     url,
-    ua,
+    httr::user_agent("http://github.com/george-wood/folk"),
     httr::write_disk(tmp, overwrite = TRUE),
     httr::progress()
   )
@@ -58,30 +52,28 @@ create_filename <- function(year, survey, state) {
   )
 }
 
-#' @importFrom checkmate assert
-#' @importFrom checkmate check_choice
-#' @importFrom checkmate check_int
-#' @importFrom checkmate check_path_for_output
 get_acs <- function(path, state, year, period, survey) {
-  assert(
-    check_path_for_output(path, overwrite = TRUE),
-    check_choice(state, state_hash$keys),
-    check_int(year, lower = 2014, upper = 2021),
-    check_choice(period, c(1, 3, 5)),
-    check_choice(survey, c("p", "h")),
+
+  checkmate::assert(
+    checkmate::check_path_for_output(path, overwrite = TRUE),
+    checkmate::check_choice(state, state_hash$keys),
+    checkmate::check_int(year, lower = 2014, upper = 2021),
+    checkmate::check_choice(period, c(1, 3, 5)),
+    checkmate::check_choice(survey, c("p", "h")),
     combine = "and"
   )
 
-  filename <- fetch_acs(path, state, year, period, survey)
-
   data.table::fread(
-    file = file.path(path, filename),
+    file = file.path(
+      path,
+      fetch_acs(path, state, year, period, survey)
+    ),
     colClasses = list(
       character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
       numeric   = c("PINCP")
     )
   )
-  
+
   # if (join_household) {
   #   n_person <- nrow(data)
 
