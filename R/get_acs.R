@@ -1,35 +1,16 @@
 ua <- httr::user_agent("http://github.com/george-wood/folk")
 
-#' @importFrom glue glue
-get_acs <- function(year,
-                    period,
-                    survey = c("person", "household"),
-                    state = NULL,
-                    path) {
+fetch_acs <- function(path, state, year, period = 1, survey = "p") {
 
-  survey <- substring(match.arg(survey), 1, 1)
+  filename <- create_filename(year, survey, state)
 
-  if (!is.integer(year) || year < 2014) {
-    stop("Invalid `year`. Must be >= 2014.")
-  }
-
-  if (is.null(state)) {
-    stop("Must provide `state`.")
-  }
-
-  if (!state %in% hash::keys(state_dictionary)) {
-    stop("Invalid `state`")
-  }
-
-  if (survey %in% c("p", "h")) {
-    stop("Invalid `survey`. Must be 'person' or 'household'.")
-  }
+  cli::cli_alert_info("Downloading ACS data to {.path {path}/{filename}}")
 
   url <- httr::modify_url(
     url = "https://www2.census.gov/",
-    path = glue(
-      "programs-surveys/acs/data/pums/",
-      "{year}/{period}/csv_{survey}{state}.zip"
+    path = sprintf(
+      "programs-surveys/acs/data/pums/%s/%s-Year/csv_%s%s.zip",
+      year, period, survey, state
     )
   )
 
@@ -42,7 +23,7 @@ get_acs <- function(year,
   if (httr::http_error(resp)) {
     stop(
       sprintf(
-        "ACS API request failed [%s]\n%s\n<%s>",
+        "ACS API request failed: [%s]",
         httr::status_code(resp)
       ),
       call. = FALSE
@@ -57,8 +38,111 @@ get_acs <- function(year,
     httr::progress()
   )
   utils::unzip(zipfile = tmp, exdir = path)
+  file.rename(
+    from = file.path(
+      path,
+      grep(utils::unzip(tmp, list = TRUE)$Name,
+           pattern = "*.csv", value = TRUE)
+    ),
+    to = file.path(path, filename)
+  )
   unlink(tmp)
+
+  return(filename)
+}
+
+create_filename <- function(year, survey, state) {
+  sprintf(
+    if (year < 2017) "ss%s%s%s.csv" else "psam%s%s%s.csv",
+    year, survey, state
+  )
+}
+
+#' @importFrom checkmate assert
+#' @importFrom checkmate check_choice
+#' @importFrom checkmate check_int
+#' @importFrom checkmate check_path_for_output
+get_acs <- function(path, state, year, period, survey) {
+  assert(
+    check_path_for_output(path, overwrite = TRUE),
+    check_choice(state, state_hash$keys),
+    check_int(year, lower = 2014, upper = 2021),
+    check_choice(period, c(1, 3, 5)),
+    check_choice(survey, c("p", "h")),
+    combine = "and"
+  )
+
+  filename <- fetch_acs(path, state, year, period, survey)
+
+  data.table::fread(
+    file = file.path(path, filename),
+    colClasses = list(
+      character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
+      numeric   = c("PINCP")
+    )
+  )
+  
+  # if (join_household) {
+  #   n_person <- nrow(data)
+
+  #   if (survey != "person") {
+  #     cli::cli_abort("`survey` must be 'person' to join household data.")
+  #   }
+
+  #   household_data <- load_acs(
+  #     root_dir = root_dir,
+  #     year     = year,
+  #     states   = states,
+  #     horizon  = horizon,
+  #     survey   = "household",
+  #     # serial_filter_list = list(data['SERIALNO']),
+  #     download = download
+  #   )
+
+  #   household_cols <- union(
+  #     setdiff(names(household_data), names(data)),
+  #     "SERIALNO"
+  #   )
+
+  #   data[household_data,
+  #     on = "SERIALNO",
+  #     (household_cols) := mget(paste0("i.", household_cols))
+  #   ]
+
+  #   if (nrow(data) != n_person) {
+  #     cli::cli_abort(
+  #       "Number of rows does not match after join: {nrow(data)} vs {n_person}"
+  #     )
+  #   }
+  # }
 
 }
 
-
+state_hash <- list(
+  keys = c(
+    "al", "ak", "az", "ar", "ca",
+    "co", "ct", "de", "fl", "ga",
+    "hi", "id", "il", "in", "ia",
+    "ks", "ky", "la", "me", "md",
+    "ma", "mi", "mn", "ms", "mo",
+    "mt", "ne", "nv", "nh", "nj",
+    "nm", "ny", "nc", "nd", "oh",
+    "ok", "or", "pa", "ri", "sc",
+    "sd", "tn", "tx", "ut", "vt",
+    "va", "wa", "wv", "wi", "wy",
+    "pr"
+  ),
+  values = c(
+    "01", "02", "04", "05", "06",
+    "08", "09", "10", "12", "13",
+    "15", "16", "17", "18", "19",
+    "20", "21", "22", "23", "24",
+    "25", "26", "27", "28", "29",
+    "30", "31", "32", "33", "34",
+    "35", "36", "37", "38", "39",
+    "40", "41", "42", "44", "45",
+    "46", "47", "48", "49", "50",
+    "51", "53", "54", "55", "56",
+    "72"
+  )
+)

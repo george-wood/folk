@@ -14,9 +14,8 @@ BugReports: https://github.com/george-wood/epts/issues
 Depends:
     R (>= 3.4.0)
 Imports: 
+    checkmate,
     cli,
     data.table,
-    glue,
-    hash,
     httr,
     utils
