@@ -2,8 +2,6 @@ fetch_acs <- function(path, state, year, period, survey) {
 
   filename <- create_filename(year, survey, state)
 
-  cli::cli_alert_info("Downloading ACS data to {.path {path}/{filename}}")
-
   url <- httr::modify_url(
     url = "https://www2.census.gov/",
     path = sprintf(
@@ -12,7 +10,7 @@ fetch_acs <- function(path, state, year, period, survey) {
     )
   )
 
-  resp <- httr::GET(url)
+  resp <- httr::HEAD(url)
 
   if (httr::http_type(resp) != "application/zip") {
     cli::cli_abort("API did not return zip")
@@ -20,9 +18,13 @@ fetch_acs <- function(path, state, year, period, survey) {
 
   if (httr::http_error(resp)) {
     cli::cli_abort(
-      "ACS API request failed: {httr::status_code(resp)}"
+      "API request failed: {httr::status_code(resp)}"
     )
   }
+
+  cli::cli_alert_info(
+    "Downloading data to {.path {path}/{filename}}"
+  )
 
   tmp <- tempfile()
   httr::GET(
@@ -31,12 +33,15 @@ fetch_acs <- function(path, state, year, period, survey) {
     httr::write_disk(tmp, overwrite = TRUE),
     httr::progress()
   )
-  utils::unzip(zipfile = tmp, exdir = path)
+  utils::unzip(
+    zipfile = tmp, exdir = path
+  )
   file.rename(
     from = file.path(
       path,
       grep(utils::unzip(tmp, list = TRUE)$Name,
-           pattern = "*.csv", value = TRUE)
+        pattern = "*.csv", value = TRUE
+      )
     ),
     to = file.path(path, filename)
   )
@@ -52,22 +57,29 @@ create_filename <- function(year, survey, state) {
   )
 }
 
-get_acs <- function(path, state, year, period, survey) {
 
+assert_acs_args <- function(path, state, year, period, survey) {
   checkmate::assert(
     checkmate::check_path_for_output(path, overwrite = TRUE),
-    checkmate::check_choice(state, state_hash$keys),
+    checkmate::check_choice(state, choices = state_hash$key),
+    checkmate::check_choice(period, choices = c(1, 5)),
+    checkmate::check_choice(survey, choices = c("p", "h")),
     checkmate::check_int(year, lower = 2014, upper = 2021),
-    checkmate::check_choice(period, c(1, 3, 5)),
-    checkmate::check_choice(survey, c("p", "h")),
     combine = "and"
   )
+}
 
-  data.table::fread(
+get_acs <- function(path, state, year, period, survey,
+                    join_household = FALSE) {
+
+  assert_acs_args(path, state, year, period, survey)
+
+  data <- data.table::fread(
     file = file.path(
       path,
       fetch_acs(path, state, year, period, survey)
     ),
+    # need to handle colClasses warnings below
     colClasses = list(
       character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
       numeric   = c("PINCP")
@@ -75,43 +87,32 @@ get_acs <- function(path, state, year, period, survey) {
   )
 
   # if (join_household) {
-  #   n_person <- nrow(data)
-
-  #   if (survey != "person") {
-  #     cli::cli_abort("`survey` must be 'person' to join household data.")
+  #   if (survey != "p") {
+  #     cli::cli_abort("`survey` must be 'p' to join household data.")
   #   }
 
-  #   household_data <- load_acs(
-  #     root_dir = root_dir,
-  #     year     = year,
-  #     states   = states,
-  #     horizon  = horizon,
-  #     survey   = "household",
-  #     # serial_filter_list = list(data['SERIALNO']),
-  #     download = download
-  #   )
+  #   household <- fetch_acs(path, state, year, period, survey = "h")
 
-  #   household_cols <- union(
-  #     setdiff(names(household_data), names(data)),
-  #     "SERIALNO"
-  #   )
+  #   # failing because it needs household data, not household filename:
+  #   cols <- union(setdiff(names(household), names(data)), "SERIALNO")
 
-  #   data[household_data,
-  #     on = "SERIALNO",
-  #     (household_cols) := mget(paste0("i.", household_cols))
-  #   ]
+  #   n <- nrow(data)
+  #   data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
+  #   checkmate::check_set_equal(n, nrow(data))
 
-  #   if (nrow(data) != n_person) {
-  #     cli::cli_abort(
-  #       "Number of rows does not match after join: {nrow(data)} vs {n_person}"
-  #     )
-  #   }
+  #   #   if (nrow(data) != n_person) {
+  #   #     cli::cli_abort(
+  #   #       "Number of rows does not match after join: {nrow(data)} vs {n_person}"
+  #   #     )
+  #   #   }
+  #   # }
   # }
 
+  data
 }
 
 state_hash <- list(
-  keys = c(
+  key = c(
     "al", "ak", "az", "ar", "ca",
     "co", "ct", "de", "fl", "ga",
     "hi", "id", "il", "in", "ia",
@@ -124,7 +125,7 @@ state_hash <- list(
     "va", "wa", "wv", "wi", "wy",
     "pr"
   ),
-  values = c(
+  value = c(
     "01", "02", "04", "05", "06",
     "08", "09", "10", "12", "13",
     "15", "16", "17", "18", "19",
