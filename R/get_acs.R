@@ -1,7 +1,5 @@
 fetch_acs <- function(path, state, year, period, survey) {
 
-  filename <- create_filename(year, survey, state)
-
   url <- httr::modify_url(
     url = "https://www2.census.gov/",
     path = sprintf(
@@ -17,14 +15,11 @@ fetch_acs <- function(path, state, year, period, survey) {
   }
 
   if (httr::http_error(resp)) {
-    cli::cli_abort(
-      "API request failed: {httr::status_code(resp)}"
-    )
+    cli::cli_abort("API request failed: {httr::status_code(resp)}")
   }
 
-  cli::cli_alert_info(
-    "Downloading data to {.path {path}/{filename}}"
-  )
+  file <- file_create_acs(path, year, survey, state)
+  cli::cli_alert_info("Downloading data to {.path {file}}")
 
   tmp <- tempfile()
   httr::GET(
@@ -40,25 +35,33 @@ fetch_acs <- function(path, state, year, period, survey) {
     from = file.path(
       path,
       grep(utils::unzip(tmp, list = TRUE)$Name,
-        pattern = "*.csv", value = TRUE
-      )
+           pattern = "*.csv", value = TRUE)
     ),
-    to = file.path(path, filename)
+    to = file
   )
   unlink(tmp)
 
-  return(filename)
+  return(file)
+
 }
 
-create_filename <- function(year, survey, state) {
+file_create_acs <- function(path, year, survey, state) {
   sprintf(
-    if (year < 2017) "ss%s%s%s.csv" else "psam%s%s%s.csv",
-    year, survey, state
+    if (year < 2017) "%s/ss%s%s%s.csv" else "%s/psam%s%s%s.csv",
+    path, year, survey, state
   )
 }
 
+muffle_fread_cols <- function(x) {
+  if (grepl(R"(Column name '.*' \(colClasses\[\[.*\]\]\[.*\]\) not found)",
+            x$message)) {
+    invokeRestart("muffleWarning")
+  } else {
+    message(x$message)
+  }
+}
 
-assert_acs_args <- function(path, state, year, period, survey) {
+assert_args_acs <- function(path, state, year, period, survey) {
   checkmate::assert(
     checkmate::check_path_for_output(path, overwrite = TRUE),
     checkmate::check_choice(state, choices = state_hash$key),
@@ -69,47 +72,57 @@ assert_acs_args <- function(path, state, year, period, survey) {
   )
 }
 
+
+
 get_acs <- function(path, state, year, period, survey,
                     join_household = FALSE) {
 
-  assert_acs_args(path, state, year, period, survey)
+  assert_args_acs(path, state, year, period, survey)
 
-  data <- data.table::fread(
-    file = file.path(
-      path,
-      fetch_acs(path, state, year, period, survey)
+  data <- withCallingHandlers(
+    data.table::fread(
+      file = fetch_acs(path, state, year, period, survey),
+      colClasses = list(
+        character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
+        numeric   = c("PINCP")
+      )
     ),
-    # need to handle colClasses warnings below
-    colClasses = list(
-      character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
-      numeric   = c("PINCP")
-    )
+    warning = muffle_fread_cols
   )
 
   # if (join_household) {
   #   if (survey != "p") {
   #     cli::cli_abort("`survey` must be 'p' to join household data.")
   #   }
-
-  #   household <- fetch_acs(path, state, year, period, survey = "h")
-
-  #   # failing because it needs household data, not household filename:
+  #
+  #   household <- withCallingHandlers(
+  #     data.table::fread(
+  #       file = fetch_acs(path, state, year, period, survey = "h"),
+  #       colClasses = list(
+  #         character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
+  #         numeric   = c("PINCP")
+  #       )
+  #     ),
+  #     warning = muffle_fread_cols
+  #   )
+  #
   #   cols <- union(setdiff(names(household), names(data)), "SERIALNO")
-
   #   n <- nrow(data)
+  #
   #   data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
-  #   checkmate::check_set_equal(n, nrow(data))
-
-  #   #   if (nrow(data) != n_person) {
-  #   #     cli::cli_abort(
-  #   #       "Number of rows does not match after join: {nrow(data)} vs {n_person}"
-  #   #     )
-  #   #   }
-  #   # }
+  #
+  #   if (nrow(data) != n) {
+  #     cli::cli_abort(
+  #       "Number of rows does not match after join: {nrow(data)} vs {n}"
+  #     )
+  #   }
   # }
 
   data
 }
+
+
+
 
 state_hash <- list(
   key = c(
