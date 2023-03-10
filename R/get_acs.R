@@ -118,7 +118,8 @@ get_acs <- function(path, state, year, period, survey,
   #   }
   # }
 
-  data
+  data.table::setDF(data)
+
 }
 
 
