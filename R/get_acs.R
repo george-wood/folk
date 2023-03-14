@@ -1,4 +1,5 @@
-fetch_acs <- function(path, state, year, period, survey) {
+fetch_acs <- function(state, year, period, survey,
+                       path = NULL) {
 
   url <- httr::modify_url(
     url = "https://www2.census.gov/",
@@ -18,38 +19,49 @@ fetch_acs <- function(path, state, year, period, survey) {
     cli::cli_abort("API request failed: {httr::status_code(resp)}")
   }
 
-  file <- file_create_acs(path, year, survey, state)
-  cli::cli_alert_info("Downloading data to {.path {file}}")
+  cli::cli_alert_info("Downloading data...")
 
   tmp <- tempfile()
+
   httr::GET(
     url,
     httr::user_agent("http://github.com/george-wood/folk"),
     httr::write_disk(tmp, overwrite = TRUE),
     httr::progress()
   )
-  utils::unzip(
-    zipfile = tmp, exdir = path
-  )
-  file.rename(
-    from = file.path(
-      path,
-      grep(utils::unzip(tmp, list = TRUE)$Name,
-           pattern = "*.csv", value = TRUE)
-    ),
-    to = file
-  )
-  unlink(tmp)
 
-  return(file)
+  csv_name <- grep(
+    x = utils::unzip(tmp, list = TRUE)$Name,
+    pattern = "*.csv",
+    value = TRUE
+  )
+
+  if (is.null(path)) {
+    utils::unzip(zipfile = tmp, exdir = dirname(tmp))
+    unzipped <- file.path(dirname(tmp), csv_name)
+  } else {
+    outdir <- create_path_acs(path, year, period)
+    utils::unzip(zipfile = tmp, exdir = outdir)
+    unzipped <- file.path(outdir, csv_name)
+    cli::cli_alert_info("Data downloaded to {.path {unzipped}}")
+  }
+
+  return(
+    data.table::fread(
+      unzipped,
+      colClasses = list(
+        character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
+        numeric   = c("PINCP")
+      )
+    )
+  )
+
+  unlink(tmp)
 
 }
 
-file_create_acs <- function(path, year, survey, state) {
-  sprintf(
-    if (year < 2017) "%s/ss%s%s%s.csv" else "%s/psam%s%s%s.csv",
-    path, year, survey, state
-  )
+create_path_acs <- function(path, year, period) {
+  file.path(path, year, sprintf("%s-Year", period))
 }
 
 muffle_fread_cols <- function(x) {
@@ -61,69 +73,72 @@ muffle_fread_cols <- function(x) {
   }
 }
 
-assert_args_acs <- function(path, state, year, period, survey) {
+assert_args_acs <- function(state, year, period, survey, path) {
   checkmate::assert(
-    checkmate::check_path_for_output(path, overwrite = TRUE),
     checkmate::check_choice(state, choices = state_hash$key),
     checkmate::check_choice(period, choices = c(1, 5)),
     checkmate::check_choice(survey, choices = c("p", "h")),
     checkmate::check_int(year, lower = 2014, upper = 2021),
     combine = "and"
   )
+  checkmate::assert(
+    checkmate::check_null(path),
+    checkmate::check_path_for_output(path, overwrite = TRUE),
+    combine = "or"
+  )
 }
 
-
+#' Get a Public Use Microdata Sample from the American Community Survey
+#'
+#' @param state The state for which you are requesting data. Must be a two-letter abbreviation, e.g. `"ny"`.
+#' @param year The year of the ACS data. Must be an integer between `2014` and `2021`, inclusive.
+#' @param period The period of the ACS data collection. Either `1` or `5`. The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year estimates for the year 2021 uses 60 months of collected data between January 1, 2017 and December 31, 2021
+#' @param survey Either `p` or `h`. If `p`, person-level data will be returned. If `h`, household-level data will be returned.
+#' @param path Either `NULL` or a path to a directory. If `NULL`, the ACS data will be downloaded to a temporary file that will later be removed. If a path is given, the ACS data will be downloaded to a subdirectory.
+#' @param join_household If `FALSE`, return either person or household survey data according to the `survey` argument. If `TRUE`, join household survey data to the person data. To join household data, the `survey` argument must be `p`.
+#'
+#' @return A data frame (`data.frame`) containing a Public Use Microdata Sample (PUMS) from the American Community Survey (ACS).
 #' @export
-get_acs <- function(path, state, year, period, survey,
+get_acs <- function(state, year, period, survey, path = NULL,
                     join_household = FALSE) {
 
-  assert_args_acs(path, state, year, period, survey)
+  assert_args_acs(
+    state = state,
+    year = year,
+    period = period,
+    survey = survey,
+    path = path
+  )
 
   data <- withCallingHandlers(
-    data.table::fread(
-      file = fetch_acs(path, state, year, period, survey),
-      colClasses = list(
-        character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
-        numeric   = c("PINCP")
-      )
-    ),
+    fetch_acs(state, year, period, survey, path),
     warning = muffle_fread_cols
   )
 
-  # if (join_household) {
-  #   if (survey != "p") {
-  #     cli::cli_abort("`survey` must be 'p' to join household data.")
-  #   }
-  #
-  #   household <- withCallingHandlers(
-  #     data.table::fread(
-  #       file = fetch_acs(path, state, year, period, survey = "h"),
-  #       colClasses = list(
-  #         character = c("RT", "SOCP", "SERIALNO", "NAICSP"),
-  #         numeric   = c("PINCP")
-  #       )
-  #     ),
-  #     warning = muffle_fread_cols
-  #   )
-  #
-  #   cols <- union(setdiff(names(household), names(data)), "SERIALNO")
-  #   n <- nrow(data)
-  #
-  #   data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
-  #
-  #   if (nrow(data) != n) {
-  #     cli::cli_abort(
-  #       "Number of rows does not match after join: {nrow(data)} vs {n}"
-  #     )
-  #   }
-  # }
+  if (join_household) {
+    if (survey != "p") {
+      cli::cli_abort("`survey` must be 'p' to join household data.")
+    }
+
+    household <- withCallingHandlers(
+      fetch_acs(state, year, period, survey = "h", path),
+      warning = muffle_fread_cols
+    )
+
+    n <- nrow(data)
+    cols <- union(setdiff(names(household), names(data)), "SERIALNO")
+    data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
+
+    if (nrow(data) != n) {
+      cli::cli_abort(
+        "Number of rows does not match after join: {nrow(data)} vs {n}"
+      )
+    }
+  }
 
   data.table::setDF(data)
 
 }
-
-
-
 
 state_hash <- list(
   key = c(
