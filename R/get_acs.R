@@ -73,7 +73,7 @@ assert_args_acs <- function(path, state, year, period, survey) {
 }
 
 
-
+#' @export
 get_acs <- function(path, state, year, period, survey,
                     join_household = FALSE) {
 

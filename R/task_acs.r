@@ -1,3 +1,4 @@
+#' @export
 define_task <- function(data, features, target, group = NULL, filter = NULL,
                         target_transform = NULL, group_transform = NULL,
                         preprocess = NULL, postprocess = NULL) {
@@ -32,6 +33,7 @@ filter_adult <- substitute(
   AGEP > 16 & PINCP > 100 & WKHP > 0 & PWGTP >= 1
 )
 
+#' @export
 define_task_income <- function(data) {
   define_task(
     data = data,
@@ -55,6 +57,7 @@ define_task_income <- function(data) {
   )
 }
 
+#' @export
 define_task_employment <- function(data) {
   define_task(
     data = data,
@@ -84,6 +87,7 @@ define_task_employment <- function(data) {
   )
 }
 
+#' @export
 define_task_health_insurance <- function(data) {
   define_task(
     data = data,
@@ -126,6 +130,7 @@ filter_public_coverage <- substitute(
   AGEP < 65 & PINCP <= 30000
 )
 
+#' @export
 define_task_public_coverage <- function(data) {
   define_task(
     data = data,
@@ -162,6 +167,7 @@ filter_travel_time <- substitute(
   AGEP > 16 & PWGTP >= 1 & ESR == 1
 )
 
+#' @export
 define_task_travel_time <- function(data) {
 
   define_task(
@@ -197,6 +203,7 @@ filter_mobility <- substitute(
   AGEP > 18 | AGEP < 35
 )
 
+#' @export
 define_task_mobility <- function(data) {
   define_task(
     data = data,
@@ -235,6 +242,7 @@ filter_employment <- substitute(
   AGEP > 16 & AGEP < 90 & PWGTP >= 1
 )
 
+#' @export
 define_task_employment_filtered <- function(data) {
   define_task(
     data = data,
@@ -265,6 +273,7 @@ define_task_employment_filtered <- function(data) {
   )
 }
 
+#' @export
 define_task_income_poverty_ratio <- function(data) {
   define_task(
     data = data,
