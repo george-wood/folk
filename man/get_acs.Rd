@@ -15,7 +15,7 @@ get_acs(state, year, period, survey, path = NULL, join_household = FALSE)
 
 \item{survey}{Either \code{p} or \code{h}. If \code{p}, person-level data will be returned. If \code{h}, household-level data will be returned.}
 
-\item{path}{Either \code{NULL} or a path to a directory. If \code{NULL}, the ACS data will be downloaded to a temporary file that will later be removed. If a path is given, the ACS data will be downloaded to a subdirectory.}
+\item{path}{Either \code{NULL} or a path to a directory. If \code{NULL}, the data will be downloaded to a temporary file that will later be removed. If a path is given, the data will be downloaded to a subdirectory of that path.}
 
 \item{join_household}{If \code{FALSE}, return either person or household survey data according to the \code{survey} argument. If \code{TRUE}, join household survey data to the person data. To join household data, the \code{survey} argument must be \code{p}.}
 }

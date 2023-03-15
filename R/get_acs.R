@@ -1,3 +1,55 @@
+#' Get a Public Use Microdata Sample from the American Community Survey
+#'
+#' @param state The state for which you are requesting data. Must be a two-letter abbreviation, e.g. `"ny"`.
+#' @param year The year of the ACS data. Must be an integer between `2014` and `2021`, inclusive.
+#' @param period The period of the ACS data collection. Either `1` or `5`. The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year estimates for the year 2021 uses 60 months of collected data between January 1, 2017 and December 31, 2021
+#' @param survey Either `p` or `h`. If `p`, person-level data will be returned. If `h`, household-level data will be returned.
+#' @param path Either `NULL` or a path to a directory. If `NULL`, the data will be downloaded to a temporary file that will later be removed. If a path is given, the data will be downloaded to a subdirectory of that path.
+#' @param join_household If `FALSE`, return either person or household survey data according to the `survey` argument. If `TRUE`, join household survey data to the person data. To join household data, the `survey` argument must be `p`.
+#'
+#' @return A data frame (`data.frame`) containing a Public Use Microdata Sample (PUMS) from the American Community Survey (ACS).
+#' @export
+get_acs <- function(state, year, period, survey, path = NULL,
+                    join_household = FALSE) {
+
+  assert_args_acs(
+    state = state,
+    year = year,
+    period = period,
+    survey = survey,
+    path = path
+  )
+
+  data <- withCallingHandlers(
+    fetch_acs(state, year, period, survey, path),
+    warning = muffle_fread_cols
+  )
+
+  if (join_household) {
+    if (survey != "p") {
+      cli::cli_abort("`survey` must be 'p' to join household data.")
+    }
+
+    household <- withCallingHandlers(
+      fetch_acs(state, year, period, survey = "h", path),
+      warning = muffle_fread_cols
+    )
+
+    n <- nrow(data)
+    cols <- union(setdiff(names(household), names(data)), "SERIALNO")
+    data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
+
+    if (nrow(data) != n) {
+      cli::cli_abort(
+        "Number of rows does not match after join: {nrow(data)} vs {n}"
+      )
+    }
+  }
+
+  structure(data.table::setDF(data), class = c("data.frame", "acs"))
+
+}
+
 fetch_acs <- function(state, year, period, survey,
                        path = NULL) {
 
@@ -86,58 +138,6 @@ assert_args_acs <- function(state, year, period, survey, path) {
     checkmate::check_path_for_output(path, overwrite = TRUE),
     combine = "or"
   )
-}
-
-#' Get a Public Use Microdata Sample from the American Community Survey
-#'
-#' @param state The state for which you are requesting data. Must be a two-letter abbreviation, e.g. `"ny"`.
-#' @param year The year of the ACS data. Must be an integer between `2014` and `2021`, inclusive.
-#' @param period The period of the ACS data collection. Either `1` or `5`. The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year estimates for the year 2021 uses 60 months of collected data between January 1, 2017 and December 31, 2021
-#' @param survey Either `p` or `h`. If `p`, person-level data will be returned. If `h`, household-level data will be returned.
-#' @param path Either `NULL` or a path to a directory. If `NULL`, the ACS data will be downloaded to a temporary file that will later be removed. If a path is given, the ACS data will be downloaded to a subdirectory.
-#' @param join_household If `FALSE`, return either person or household survey data according to the `survey` argument. If `TRUE`, join household survey data to the person data. To join household data, the `survey` argument must be `p`.
-#'
-#' @return A data frame (`data.frame`) containing a Public Use Microdata Sample (PUMS) from the American Community Survey (ACS).
-#' @export
-get_acs <- function(state, year, period, survey, path = NULL,
-                    join_household = FALSE) {
-
-  assert_args_acs(
-    state = state,
-    year = year,
-    period = period,
-    survey = survey,
-    path = path
-  )
-
-  data <- withCallingHandlers(
-    fetch_acs(state, year, period, survey, path),
-    warning = muffle_fread_cols
-  )
-
-  if (join_household) {
-    if (survey != "p") {
-      cli::cli_abort("`survey` must be 'p' to join household data.")
-    }
-
-    household <- withCallingHandlers(
-      fetch_acs(state, year, period, survey = "h", path),
-      warning = muffle_fread_cols
-    )
-
-    n <- nrow(data)
-    cols <- union(setdiff(names(household), names(data)), "SERIALNO")
-    data[household, on = "SERIALNO", (cols) := mget(paste0("i.", cols))]
-
-    if (nrow(data) != n) {
-      cli::cli_abort(
-        "Number of rows does not match after join: {nrow(data)} vs {n}"
-      )
-    }
-  }
-
-  data.table::setDF(data)
-
 }
 
 state_hash <- list(

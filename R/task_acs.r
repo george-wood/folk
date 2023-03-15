@@ -1,42 +1,8 @@
-#' @export
-define_task <- function(data, features, target, group = NULL, filter = NULL,
-                        target_transform = NULL, group_transform = NULL,
-                        preprocess = NULL, postprocess = NULL) {
-
-  data <- data.table::setDT(data)[, c(target, features), with = FALSE]
-
-  if (!is.null(filter)) {
-    data <- data[eval(filter)]
-  }
-
-  if (!is.null(preprocess)) {
-    data[, (features) := lapply(.SD, preprocess), .SDcols = features]
-  }
-
-  if (!is.null(target_transform)) {
-    data[, (target) := lapply(.SD, target_transform), .SDcols = target]
-  }
-
-  if (!is.null(group_transform)) {
-    data[, (group) := lapply(.SD, group_transform), .SDcols = group]
-  }
-
-  if (!is.null(postprocess)) {
-    data[, (features) := lapply(.SD, postprocess), .SDcols = features]
-  }
-
-  data.table::setDF(data)[]
-
-}
-
 filter_adult <- substitute(
   AGEP > 16 & PINCP > 100 & WKHP > 0 & PWGTP >= 1
 )
 
-#' @export
-define_task_income <- function(data) {
-  define_task(
-    data = data,
+set_task_income <- function(
     features = c("AGEP",
                  "COW",
                  "SCHL",
@@ -54,13 +20,11 @@ define_task_income <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
-#' @export
-define_task_employment <- function(data) {
-  define_task(
-    data = data,
+set_task_employment <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -84,13 +48,11 @@ define_task_employment <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
-#' @export
-define_task_health_insurance <- function(data) {
-  define_task(
-    data = data,
+set_task_health_insurance <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -123,17 +85,15 @@ define_task_health_insurance <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
 filter_public_coverage <- substitute(
   AGEP < 65 & PINCP <= 30000
 )
 
-#' @export
-define_task_public_coverage <- function(data) {
-  define_task(
-    data = data,
+set_task_public_coverage <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -160,18 +120,15 @@ define_task_public_coverage <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
 filter_travel_time <- substitute(
   AGEP > 16 & PWGTP >= 1 & ESR == 1
 )
 
-#' @export
-define_task_travel_time <- function(data) {
-
-  define_task(
-    data = data,
+set_task_travel_time <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -195,18 +152,15 @@ define_task_travel_time <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
-
+) {
+  invisible(FALSE)
 }
 
 filter_mobility <- substitute(
   AGEP > 18 | AGEP < 35
 )
 
-#' @export
-define_task_mobility <- function(data) {
-  define_task(
-    data = data,
+set_task_mobility <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -235,17 +189,15 @@ define_task_mobility <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
 filter_employment <- substitute(
   AGEP > 16 & AGEP < 90 & PWGTP >= 1
 )
 
-#' @export
-define_task_employment_filtered <- function(data) {
-  define_task(
-    data = data,
+set_task_employment_filtered <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -270,13 +222,11 @@ define_task_employment_filtered <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
 
-#' @export
-define_task_income_poverty_ratio <- function(data) {
-  define_task(
-    data = data,
+set_task_income_poverty_ratio <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -303,6 +253,6 @@ define_task_income_poverty_ratio <- function(data) {
     group_transform = NULL,
     preprocess = NULL,
     postprocess = replace_na_
-  )
+) {
+  invisible(FALSE)
 }
-
