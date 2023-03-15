@@ -23,9 +23,51 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the development version of folk from [GitHub](https://github.com/) using:
+You can install the development version of folk from GitHub using:
 
-``` r
+```{r, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("george-wood/epts")
+devtools::install_github("george-wood/folk")
 ```
+
+## Usage
+
+```{r, results = "hide", message = FALSE}
+library(folk)
+
+al <- get_acs(state = "al", year = 2014, period = 1, survey = "p")
+```
+
+```{r}
+al_income <- set_task(al, task = "income")
+head(al_income)
+```
+
+```{r message = FALSE}
+library(tidymodels)
+
+set.seed(0)
+al_split <- initial_split(al_income, prop = 0.8)
+al_train <- training(al_split)
+al_test <- testing(al_split)
+
+pred <-
+  logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification") |>
+  fit(PINCP ~ ., data = al_train) |>
+  predict(new_data = al_test, type = "class")
+
+yhat <- as.numeric(as.character(pred$.pred_class))
+
+white_tpr <- mean(yhat[(al_test$PINCP == 1) & (al_test$RAC1P == 1)])
+black_tpr <- mean(yhat[(al_test$PINCP == 1) & (al_test$RAC1P == 2)])
+
+# equality of opportunity violation
+white_tpr - black_tpr
+```
+
+
+
+
+
