@@ -15,7 +15,7 @@ new_task <- function(data, features, target, group = NULL, filter = NULL,
                      target_transform = NULL, group_transform = NULL,
                      preprocess = NULL, postprocess = NULL) {
 
-  data.table::setDT(data)
+  data <- data.table::as.data.table(data)
 
   if (!is.null(filter)) {
     if (is.character(filter)) {
@@ -44,66 +44,6 @@ new_task <- function(data, features, target, group = NULL, filter = NULL,
     data[, (features) := lapply(.SD, postprocess), .SDcols = features]
   }
 
-  data.table::setDF(data)[]
+  as_folk_task(data)
 
 }
-
-#' Set a prediction task
-#'
-#' @param data A data frame.
-#' @param task A character string for the prediction task. See [show_tasks()].
-#'
-#' @export
-set_task <- function(data, task) {
-  UseMethod("set_task")
-}
-
-#' @export
-set_task.acs <- function(data, task) {
-  task_fun <- show_tasks(data)[[task]]
-  do.call(
-    new_task,
-    c(list(data = data), formals(task_fun))
-  )
-}
-
-#' @export
-set_task.default <- function(data, task) {
-  cli::cli_abort(
-    "`set_task()` is not yet available for this object type."
-  )
-  invisible(FALSE)
-}
-
-#' Display available prediction tasks for a data object
-#'
-#' @param data A data frame.
-#'
-#' @export
-show_tasks <- function(data) {
-  UseMethod("show_tasks")
-}
-
-#' @export
-show_tasks.acs <- function(data) {
-  list(
-    income = set_task_income,
-    employment = set_task_employment,
-    health_insurance = set_task_health_insurance,
-    public_coverage = set_task_public_coverage,
-    travel_time = set_task_travel_time,
-    mobility = set_task_mobility,
-    employment_filtered = set_task_employment_filtered,
-    income_poverty_ratio = set_task_income_poverty_ratio
-  )
-}
-
-#' @export
-show_tasks.default <- function(data) {
-  cli::cli_abort(
-    "No tasks available for this object type.
-    Consider using `new_task()` to define a custom task."
-  )
-  invisible(FALSE)
-}
-

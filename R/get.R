@@ -46,12 +46,11 @@ get_acs <- function(state, year, period, survey, path = NULL,
     }
   }
 
-  structure(data.table::setDF(data), class = c("data.frame", "acs"))
+  as_folk(data, source = "acs")
 
 }
 
-fetch_acs <- function(state, year, period, survey,
-                       path = NULL) {
+fetch_acs <- function(state, year, period, survey, path = NULL) {
 
   url <- httr::modify_url(
     url = "https://www2.census.gov/",

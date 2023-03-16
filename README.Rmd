@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/george-wood/folk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/george-wood/folk/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/george-wood/folk/branch/master/graph/badge.svg?token=ZM8CUR8P13)](https://codecov.io/gh/george-wood/folk)
+[![codecov](https://codecov.io/gh/george-wood/folk/branch/master/graph/badge.svg?token=QXIN95S7AJ)](https://codecov.io/gh/george-wood/folk)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
