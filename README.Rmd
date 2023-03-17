@@ -68,6 +68,8 @@ white_tpr - black_tpr
 ```
 
 
+## Acknowledgements
 
+- The folk package is inspired by the [folktables](https://github.com/socialfoundations/folktables) Python package.
 
 

@@ -64,3 +64,9 @@ black_tpr <- mean(yhat[(al_test$PINCP == 1) & (al_test$RAC1P == 2)])
 white_tpr - black_tpr
 #> [1] 0.2505592
 ```
+
+## Acknowledgements
+
+- The folk package is inspired by the
+  [folktables](https://github.com/socialfoundations/folktables) Python
+  package.
