@@ -1,14 +1,14 @@
 #' `folk_task` class
 #'
 #' @description
-#' The `folk_task` class is a subclass of [`data.frame`][base::data.frame()],
-#' created to represent a data object that has been preprocessed using
-#' `set_task()`.
+#' The `folk_task` class is a subclass of `folk_df` and
+#' [`data.frame`][base::data.frame()], created to represent a data object
+#' that has been preprocessed using `set_task()`.
 #'
 #' @section Properties of `folk_task`:
 #'
 #' Objects of class `folk_task` have:
-#' * A `class` attribute of `c("data.frame", "folk_df", "folk_task")`.
+#' * A `class` attribute of `c("folk_task", "folk_df", "data.frame")`.
 #' * A `source` attribute which can be queried to check the data source for
 #'   folk data.
 #'

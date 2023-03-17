@@ -5,16 +5,16 @@
 \alias{folk_task}
 \title{\code{folk_task} class}
 \description{
-The \code{folk_task} class is a subclass of \code{\link[base:data.frame]{data.frame}},
-created to represent a data object that has been preprocessed using
-\code{set_task()}.
+The \code{folk_task} class is a subclass of \code{folk_df} and
+\code{\link[base:data.frame]{data.frame}}, created to represent a data object
+that has been preprocessed using \code{set_task()}.
 }
 \section{Properties of \code{folk_task}}{
 
 
 Objects of class \code{folk_task} have:
 \itemize{
-\item A \code{class} attribute of \code{c("data.frame", "folk_df", "folk_task")}.
+\item A \code{class} attribute of \code{c("folk_task", "folk_df", "data.frame")}.
 \item A \code{source} attribute which can be queried to check the data source for
 folk data.
 }

@@ -14,7 +14,7 @@ consistency checking when using the folk package.
 
 Objects of class \code{folk_df} have:
 \itemize{
-\item A \code{class} attribute of \code{c("data.frame", "folk_df")}.
+\item A \code{class} attribute of \code{c("folk_df", "data.frame")}.
 \item A \code{source} attribute which can be queried to check the data source for
 folk data. This attribute is used primarily to ensure that \code{folk_df}
 objects are directed to the appropriate prediction tasks provided by the
@@ -25,8 +25,8 @@ folk package.
 \section{Behavior of \code{folk_df}}{
 
 
-The default behaviour of \code{folk_df} objects matches that of \link{data.frame}s. The
-key difference is that:
+The default behaviour of \code{folk_df} objects matches that of \link{data.frame}s.
+The key difference is that:
 \itemize{
 \item If you run a function provided by the folk package, it will typically check
 that an object has the class \code{folk_df} or is coercible to \code{folk_df}.
