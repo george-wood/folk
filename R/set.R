@@ -10,10 +10,12 @@ set_task <- function(data, task) {
 
 #' @export
 set_task.folk_df <- function(data, task) {
-  task_fun <- show_tasks(data)[[task]]
   do.call(
     new_task,
-    c(list(data = data), formals(task_fun))
+    c(
+      list(data = data),
+      formals(show_tasks(data)[[task]])
+    )
   )
 }
 
@@ -22,5 +24,4 @@ set_task.default <- function(data, task) {
   cli::cli_abort(
     "`set_task()` is not yet available for this object type."
   )
-  invisible(FALSE)
 }

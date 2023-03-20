@@ -21,6 +21,11 @@ set_task_income <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong income} prediction task.
+    See {.fn folk::set_task_income} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -49,6 +54,11 @@ set_task_employment <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong employment} prediction task.
+    See {.fn folk::set_task_employment} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -86,6 +96,11 @@ set_task_health_insurance <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong health insurance} prediction task.
+    See {.fn folk::set_task_health_insurance} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -121,6 +136,11 @@ set_task_public_coverage <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong public coverage} prediction task.
+    See {.fn folk::set_task_public_coverage} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -153,6 +173,11 @@ set_task_travel_time <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong travel time} prediction task.
+    See {.fn folk::set_task_travel_time} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -190,6 +215,11 @@ set_task_mobility <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong mobility} prediction task.
+    See {.fn folk::set_task_mobility} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -223,6 +253,11 @@ set_task_employment_filtered <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong employment filtered} prediction task.
+    See {.fn folk::set_task_employment_filtered} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }
 
@@ -254,5 +289,10 @@ set_task_income_poverty_ratio <- function(
     preprocess = NULL,
     postprocess = replace_na_
 ) {
+  cli::cli_alert_info(
+    "Setting {.strong income-poverty ratio} prediction task.
+    See {.fn folk::set_task_income_poverty_ratio} for details.",
+    wrap = TRUE
+  )
   invisible(FALSE)
 }

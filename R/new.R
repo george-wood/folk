@@ -26,7 +26,7 @@ new_task <- function(data, features, target, group = NULL, filter = NULL,
     }
   }
 
-  data <- data[, c(target, features), with = FALSE]
+  data <- data[, c(target, group, setdiff(features, group)), with = FALSE]
 
   if (!is.null(preprocess)) {
     data[, (features) := lapply(.SD, preprocess), .SDcols = features]

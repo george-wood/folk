@@ -24,14 +24,14 @@ as_folk.data.frame <- function(x, source = NULL) {
 
 #' @export
 #' @rdname as_folk
-as_folk.data.table <- function(x, source = NULL) {
-  structure(data.table::setDF(x), class = folk_df_class, source = source)
+as_folk.list <- function(x, source = NULL) {
+  structure(as.data.frame(x), class = folk_df_class, source = source)
 }
 
 #' @export
 #' @rdname as_folk
-as_folk.list <- function(x, source = NULL) {
-  structure(as.data.frame(x), class = folk_df_class, source = source)
+as_folk.data.table <- function(x, source = NULL) {
+  structure(data.table::setDF(x), class = folk_df_class, source = source)
 }
 
 #' @export

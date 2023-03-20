@@ -3,8 +3,8 @@
 \name{as_folk}
 \alias{as_folk}
 \alias{as_folk.data.frame}
-\alias{as_folk.data.table}
 \alias{as_folk.list}
+\alias{as_folk.data.table}
 \alias{as_folk.tbl}
 \title{Coerce data frames, lists, and more to data frames with as_folk subclass}
 \usage{
@@ -12,9 +12,9 @@ as_folk(x, source = NULL)
 
 \method{as_folk}{data.frame}(x, source = NULL)
 
-\method{as_folk}{data.table}(x, source = NULL)
-
 \method{as_folk}{list}(x, source = NULL)
+
+\method{as_folk}{data.table}(x, source = NULL)
 
 \method{as_folk}{tbl}(x, source = NULL)
 }
