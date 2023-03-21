@@ -19,21 +19,30 @@ new_task(
 \arguments{
 \item{data}{A data frame.}
 
-\item{features}{A character vector of specifying the columns to be used as features.}
+\item{features}{A character vector of specifying the columns to be used
+as features.}
 
-\item{target}{A string specifying the name of the column to be used as the target variable.}
+\item{target}{A string specifying the name of the column to be used as
+the target variable.}
 
-\item{group}{A string specifying the name of the column to be used as the group membership variable.}
+\item{group}{A string specifying the name of the column to be used as
+the group membership variable.}
 
-\item{filter}{A string specifying filter conditions for the data. For example, \code{"AGEP > 18 & PINCP > 100"}. Alternatively, a call can be supplied, e.g., \code{substitute(AGEP > 18 & PINCP > 100)}.}
+\item{filter}{A string specifying filter conditions for the data.
+For example, \code{"AGEP > 18 & PINCP > 100"}. Alternatively, a call can
+be supplied, e.g., \code{substitute(AGEP > 18 & PINCP > 100)}.}
 
-\item{target_transform}{A function that will be applied to the target column. For example, \code{target_transform = function(x) ifelse(x > 1, 1, 0)}.}
+\item{target_transform}{A function that will be applied to the target
+column. For example, \code{target_transform = function(x) ifelse(x > 1, 1, 0)}.}
 
 \item{group_transform}{A function that will be applied to the group column.}
 
-\item{preprocess}{A function that will be applied to all feature columns before the target transform and group transform. For example, \code{preprocess = function(x) as.integer(x)}.}
+\item{preprocess}{A function that will be applied to all feature columns
+before the target transform and group transform. For example,
+\code{preprocess = function(x) as.integer(x)}.}
 
-\item{postprocess}{A function that will be applied to all feature columns after the target transform and group transform.}
+\item{postprocess}{A function that will be applied to all feature
+columns after the target transform and group transform.}
 }
 \description{
 Define a new prediction task

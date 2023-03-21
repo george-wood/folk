@@ -4,23 +4,43 @@
 \alias{get_acs}
 \title{Get a Public Use Microdata Sample from the American Community Survey}
 \usage{
-get_acs(state, year, period, survey, path = NULL, join_household = FALSE)
+get_acs(
+  state,
+  year,
+  period,
+  survey = c("person", "household"),
+  path = NULL,
+  join_household = FALSE
+)
 }
 \arguments{
-\item{state}{The state for which you are requesting data. Must be a two-letter abbreviation, e.g. \code{"ny"}.}
+\item{state}{The state for which you are requesting data. Must be a
+two-letter abbreviation, e.g. \code{"ny"}.}
 
-\item{year}{The year of the ACS data. Must be an integer between \code{2014} and \code{2021}, inclusive.}
+\item{year}{The year of the ACS data. Must be an integer between \code{2014} and
+\code{2021}, inclusive.}
 
-\item{period}{The period of the ACS data collection. Either \code{1} or \code{5}. The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year estimates for the year 2021 uses 60 months of collected data between January 1, 2017 and December 31, 2021}
+\item{period}{The period of the ACS data collection. Either \code{1} or \code{5}.
+The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year
+estimates for the year 2021 uses 60 months of collected data between
+January 1, 2017 and December 31, 2021}
 
-\item{survey}{Either \code{p} or \code{h}. If \code{p}, person-level data will be returned. If \code{h}, household-level data will be returned.}
+\item{survey}{Either \code{person} or \code{household}. If \code{person}, person-level
+data will be returned. If \code{household}, household-level data will be
+returned.}
 
-\item{path}{Either \code{NULL} or a path to a directory. If \code{NULL}, the data will be downloaded to a temporary file that will later be removed. If a path is given, the data will be downloaded to a subdirectory of that path.}
+\item{path}{Either \code{NULL} or a path to a directory. If \code{NULL}, the data
+will be downloaded to a temporary file that will later be removed. If a
+path is given, the data will be downloaded to a subdirectory of that path.}
 
-\item{join_household}{If \code{FALSE}, return either person or household survey data according to the \code{survey} argument. If \code{TRUE}, join household survey data to the person data. To join household data, the \code{survey} argument must be \code{p}.}
+\item{join_household}{If \code{FALSE}, return either person or household survey
+data according to the \code{survey} argument. If \code{TRUE}, join household
+survey data to the person data. To join household data, the \code{survey}
+argument must be \code{person}.}
 }
 \value{
-A data frame (\code{data.frame}) containing a Public Use Microdata Sample (PUMS) from the American Community Survey (ACS).
+A data frame (\code{data.frame}) containing a Public Use Microdata Sample
+(PUMS) from the American Community Survey (ACS).
 }
 \description{
 Get a Public Use Microdata Sample from the American Community Survey

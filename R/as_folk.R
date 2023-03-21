@@ -4,8 +4,8 @@
 #' `as_folk()` coerces an existing object, such as a data frame or data table,
 #' to a data frame with a `folk_df` subclass.
 #'
-#' @param x A data frame, list, matrix, or other object that could reasonably be
-#'   coerced to a data frame.
+#' @param x A data frame, list, matrix, or other object that could reasonably
+#'   be coerced to a data frame.
 #' @param source A character vector denoting the source of the data,
 #'   e.g., "acs".
 #' @export

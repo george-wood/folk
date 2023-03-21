@@ -19,8 +19,8 @@ as_folk(x, source = NULL)
 \method{as_folk}{tbl}(x, source = NULL)
 }
 \arguments{
-\item{x}{A data frame, list, matrix, or other object that could reasonably be
-coerced to a data frame.}
+\item{x}{A data frame, list, matrix, or other object that could reasonably
+be coerced to a data frame.}
 
 \item{source}{A character vector denoting the source of the data,
 e.g., "acs".}

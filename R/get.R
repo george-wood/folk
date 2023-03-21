@@ -1,23 +1,38 @@
 #' Get a Public Use Microdata Sample from the American Community Survey
 #'
-#' @param state The state for which you are requesting data. Must be a two-letter abbreviation, e.g. `"ny"`.
-#' @param year The year of the ACS data. Must be an integer between `2014` and `2021`, inclusive.
-#' @param period The period of the ACS data collection. Either `1` or `5`. The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year estimates for the year 2021 uses 60 months of collected data between January 1, 2017 and December 31, 2021
-#' @param survey Either `p` or `h`. If `p`, person-level data will be returned. If `h`, household-level data will be returned.
-#' @param path Either `NULL` or a path to a directory. If `NULL`, the data will be downloaded to a temporary file that will later be removed. If a path is given, the data will be downloaded to a subdirectory of that path.
-#' @param join_household If `FALSE`, return either person or household survey data according to the `survey` argument. If `TRUE`, join household survey data to the person data. To join household data, the `survey` argument must be `p`.
+#' @param state The state for which you are requesting data. Must be a
+#'   two-letter abbreviation, e.g. `"ny"`.
+#' @param year The year of the ACS data. Must be an integer between `2014` and
+#'   `2021`, inclusive.
+#' @param period The period of the ACS data collection. Either `1` or `5`.
+#'   The ACS provides 1-Year and 5-Year estimates. For example, the 5-Year
+#'   estimates for the year 2021 uses 60 months of collected data between
+#'   January 1, 2017 and December 31, 2021
+#' @param survey Either `person` or `household`. If `person`, person-level
+#'   data will be returned. If `household`, household-level data will be
+#'   returned.
+#' @param path Either `NULL` or a path to a directory. If `NULL`, the data
+#'   will be downloaded to a temporary file that will later be removed. If a
+#'   path is given, the data will be downloaded to a subdirectory of that path.
+#' @param join_household If `FALSE`, return either person or household survey
+#'   data according to the `survey` argument. If `TRUE`, join household
+#'   survey data to the person data. To join household data, the `survey`
+#'   argument must be `person`.
 #'
-#' @return A data frame (`data.frame`) containing a Public Use Microdata Sample (PUMS) from the American Community Survey (ACS).
+#' @return A data frame (`data.frame`) containing a Public Use Microdata Sample
+#'   (PUMS) from the American Community Survey (ACS).
 #' @export
-get_acs <- function(state, year, period, survey, path = NULL,
-                    join_household = FALSE) {
+get_acs <- function(state, year, period, survey = c("person", "household"),
+                    path = NULL, join_household = FALSE) {
+
+  survey <- match.arg(survey)
 
   assert_args_acs(
-    state = state,
-    year = year,
+    state  = state,
+    year   = year,
     period = period,
     survey = survey,
-    path = path
+    path   = path
   )
 
   data <- withCallingHandlers(
@@ -26,12 +41,12 @@ get_acs <- function(state, year, period, survey, path = NULL,
   )
 
   if (join_household) {
-    if (survey != "p") {
-      cli::cli_abort("`survey` must be 'p' to join household data.")
+    if (survey != "person") {
+      cli::cli_abort("`survey` must be 'person' to join household data.")
     }
 
     household <- withCallingHandlers(
-      fetch_acs(state, year, period, survey = "h", path),
+      fetch_acs(state, year, period, survey = "household", path),
       warning = muffle_fread_cols
     )
 
@@ -56,7 +71,7 @@ fetch_acs <- function(state, year, period, survey, path = NULL) {
     url = "https://www2.census.gov/",
     path = sprintf(
       "programs-surveys/acs/data/pums/%s/%s-Year/csv_%s%s.zip",
-      year, period, survey, state
+      year, period, substr(survey, start = 1, stop = 1), state
     )
   )
 
@@ -116,8 +131,12 @@ create_path_acs <- function(path, year, period) {
 }
 
 muffle_fread_cols <- function(x) {
-  if (grepl(R"(Column name '.*' \(colClasses\[\[.*\]\]\[.*\]\) not found)",
-            x$message)) {
+  if (
+    grepl(
+      R"(Column name '.*' \(colClasses\[\[.*\]\]\[.*\]\) not found)",
+      x$message
+    )
+  ) {
     invokeRestart("muffleWarning")
   } else {
     message(x$message)
@@ -128,7 +147,7 @@ assert_args_acs <- function(state, year, period, survey, path) {
   checkmate::assert(
     checkmate::check_choice(state, choices = state_hash$key),
     checkmate::check_choice(period, choices = c(1, 5)),
-    checkmate::check_choice(survey, choices = c("p", "h")),
+    checkmate::check_choice(survey, choices = c("person", "household")),
     checkmate::check_int(year, lower = 2014, upper = 2021),
     combine = "and"
   )
