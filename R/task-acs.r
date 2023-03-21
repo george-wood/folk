@@ -2,7 +2,7 @@ filter_adult <- substitute(
   AGEP > 16 & PINCP > 100 & WKHP > 0 & PWGTP >= 1
 )
 
-set_task_income <- function(
+task_income <- function(
     features = c("AGEP",
                  "COW",
                  "SCHL",
@@ -23,13 +23,13 @@ set_task_income <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong income} prediction task.
-    See {.fn folk::set_task_income} for details.",
+    See {.fn folk::task_income} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
 }
 
-set_task_employment <- function(
+task_employment <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -56,13 +56,13 @@ set_task_employment <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong employment} prediction task.
-    See {.fn folk::set_task_employment} for details.",
+    See {.fn folk::task_employment} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
 }
 
-set_task_health_insurance <- function(
+task_health_insurance <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -98,7 +98,7 @@ set_task_health_insurance <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong health insurance} prediction task.
-    See {.fn folk::set_task_health_insurance} for details.",
+    See {.fn folk::task_health_insurance} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
@@ -108,7 +108,7 @@ filter_public_coverage <- substitute(
   AGEP < 65 & PINCP <= 30000
 )
 
-set_task_public_coverage <- function(
+task_public_coverage <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -138,7 +138,7 @@ set_task_public_coverage <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong public coverage} prediction task.
-    See {.fn folk::set_task_public_coverage} for details.",
+    See {.fn folk::task_public_coverage} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
@@ -148,7 +148,7 @@ filter_travel_time <- substitute(
   AGEP > 16 & PWGTP >= 1 & ESR == 1
 )
 
-set_task_travel_time <- function(
+task_travel_time <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -175,7 +175,7 @@ set_task_travel_time <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong travel time} prediction task.
-    See {.fn folk::set_task_travel_time} for details.",
+    See {.fn folk::task_travel_time} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
@@ -185,7 +185,7 @@ filter_mobility <- substitute(
   AGEP > 18 | AGEP < 35
 )
 
-set_task_mobility <- function(
+task_mobility <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -217,7 +217,7 @@ set_task_mobility <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong mobility} prediction task.
-    See {.fn folk::set_task_mobility} for details.",
+    See {.fn folk::task_mobility} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
@@ -227,7 +227,7 @@ filter_employment <- substitute(
   AGEP > 16 & AGEP < 90 & PWGTP >= 1
 )
 
-set_task_employment_filtered <- function(
+task_employment_filtered <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -255,13 +255,13 @@ set_task_employment_filtered <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong employment filtered} prediction task.
-    See {.fn folk::set_task_employment_filtered} for details.",
+    See {.fn folk::task_employment_filtered} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
 }
 
-set_task_income_poverty_ratio <- function(
+task_income_poverty_ratio <- function(
     features = c("AGEP",
                  "SCHL",
                  "MAR",
@@ -291,7 +291,7 @@ set_task_income_poverty_ratio <- function(
 ) {
   cli::cli_alert_info(
     "Setting {.strong income-poverty ratio} prediction task.
-    See {.fn folk::set_task_income_poverty_ratio} for details.",
+    See {.fn folk::task_income_poverty_ratio} for details.",
     wrap = TRUE
   )
   invisible(FALSE)
