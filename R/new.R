@@ -24,6 +24,8 @@ new_task <- function(data, features, target, group = NULL, filter = NULL,
                      target_transform = NULL, group_transform = NULL,
                      preprocess = NULL, postprocess = NULL) {
 
+  argg <- as.list(environment())
+
   data <- data.table::as.data.table(data)
 
   if (!is.null(filter)) {
@@ -53,6 +55,6 @@ new_task <- function(data, features, target, group = NULL, filter = NULL,
     data[, (features) := lapply(.SD, postprocess), .SDcols = features]
   }
 
-  as_folk_task(data)
+  as_folk_task(data, definition = within(argg, rm(data)))
 
 }

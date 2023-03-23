@@ -7,19 +7,21 @@
 \alias{as_folk_task.data.table}
 \title{Add a folk_task subclass to folk_df objects}
 \usage{
-as_folk_task(x, source = NULL)
+as_folk_task(x, source = NULL, ...)
 
-\method{as_folk_task}{folk_df}(x, source = NULL)
+\method{as_folk_task}{folk_df}(x, source = NULL, ...)
 
-\method{as_folk_task}{data.frame}(x, source = NULL)
+\method{as_folk_task}{data.frame}(x, source = NULL, ...)
 
-\method{as_folk_task}{data.table}(x, source = NULL)
+\method{as_folk_task}{data.table}(x, source = NULL, ...)
 }
 \arguments{
 \item{x}{A folk_df object.}
 
 \item{source}{A character vector denoting the source of the data,
 e.g., "acs". If NULL, it will be inherited from the object passed to \code{x}.}
+
+\item{...}{Other parameters passed onto methods.}
 }
 \description{
 \code{as_folk_task()} adds the \code{folk_task} subclass to an existing folk_df object.

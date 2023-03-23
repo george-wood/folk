@@ -16,16 +16,11 @@ task_income <- function(
     target = "PINCP",
     group = "RAC1P",
     filter = filter_adult,
-    target_transform = function(x) binary_target_(x > 50000),
+    target_transform = function(y) binary_target_(y > 50000),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong income} prediction task.
-    See {.fn folk::task_income} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -49,16 +44,11 @@ task_employment <- function(
     target = "ESR",
     group = "RAC1P",
     filter = NULL,
-    target_transform = function(x) binary_target_(x == 1),
+    target_transform = function(y) binary_target_(y == 1),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong employment} prediction task.
-    See {.fn folk::task_employment} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -91,16 +81,11 @@ task_health_insurance <- function(
     target = "HINS2",
     group = "RAC1P",
     filter = NULL,
-    target_transform = function(x) binary_target_(x == 1),
+    target_transform = function(y) binary_target_(y == 1),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong health insurance} prediction task.
-    See {.fn folk::task_health_insurance} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -131,16 +116,11 @@ task_public_coverage <- function(
     target = "PUBCOV",
     group = "RAC1P",
     filter = filter_public_coverage,
-    target_transform = function(x) binary_target_(x == 1),
+    target_transform = function(y) binary_target_(y == 1),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong public coverage} prediction task.
-    See {.fn folk::task_public_coverage} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -168,16 +148,11 @@ task_travel_time <- function(
     target = "JWMNP",
     group = "RAC1P",
     filter = filter_travel_time,
-    target_transform = function(x) binary_target_(x > 20),
+    target_transform = function(y) binary_target_(y > 20),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong travel time} prediction task.
-    See {.fn folk::task_travel_time} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -210,16 +185,11 @@ task_mobility <- function(
     target = "MIG",
     group = "RAC1P",
     filter = filter_mobility,
-    target_transform = function(x) binary_target_(x == 1),
+    target_transform = function(y) binary_target_(y == 1),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong mobility} prediction task.
-    See {.fn folk::task_mobility} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -248,16 +218,11 @@ task_employment_filtered <- function(
     target = "ESR",
     group = "RAC1P",
     filter = filter_employment,
-    target_transform = function(x) binary_target_(x == 1),
+    target_transform = function(y) binary_target_(y == 1),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong employment filtered} prediction task.
-    See {.fn folk::task_employment_filtered} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }
 
@@ -284,15 +249,10 @@ task_income_poverty_ratio <- function(
                  "WKHP"),
     target = "POVPIP",
     group = "RAC1P",
-    target_transform = function(x) binary_target_(x < 250),
+    target_transform = function(y) binary_target_(y < 250),
     group_transform = NULL,
     preprocess = NULL,
-    postprocess = replace_na_
+    postprocess = function(x) replace_na_(x, value = -1L)
 ) {
-  cli::cli_alert_info(
-    "Setting {.strong income-poverty ratio} prediction task.
-    See {.fn folk::task_income_poverty_ratio} for details.",
-    wrap = TRUE
-  )
   invisible(FALSE)
 }

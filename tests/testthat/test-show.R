@@ -4,6 +4,6 @@ test_that("For ACS data, show_tasks() returns a list of functions", {
   expect_true(all(sapply(some_tasks, is.function)))
 })
 
-test_that("show_tasks() aborts when providing generic data frame", {
-  expect_error(show_tasks(data.frame(a = 1)))
+test_that("show_tasks() warns when providing generic data frame", {
+  expect_message(show_tasks(data.frame(a = 1)))
 })

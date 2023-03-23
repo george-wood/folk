@@ -48,31 +48,33 @@ as_folk.tbl <- function(x, source = NULL) {
 #' @param x A folk_df object.
 #' @param source A character vector denoting the source of the data,
 #'   e.g., "acs". If NULL, it will be inherited from the object passed to `x`.
+#' @param ... Other parameters passed onto methods.
 #' @export
 #' @examples
 #' l <- list(a = c(1, 2), b = c(3, 4))
 #' df <- as_folk(l)
 #' as_folk_task(df)
-as_folk_task <- function(x, source = NULL) {
+as_folk_task <- function(x, source = NULL, ...) {
   UseMethod("as_folk_task")
 }
 
 #' @export
 #' @rdname as_folk_task
-as_folk_task.folk_df <- function(x, source = NULL) {
-  structure(x, class = folk_task_class, source = source)
+as_folk_task.folk_df <- function(x, source = NULL, ...) {
+  structure(x, class = folk_task_class, source = source, ...)
 }
 
 #' @export
 #' @rdname as_folk_task
-as_folk_task.data.frame <- function(x, source = NULL) {
-  structure(x, class = folk_task_class, source = source)
+as_folk_task.data.frame <- function(x, source = NULL, ...) {
+  structure(x, class = folk_task_class, source = source, ...)
 }
 
 #' @export
 #' @rdname as_folk_task
-as_folk_task.data.table <- function(x, source = NULL) {
-  structure(data.table::setDF(x), class = folk_task_class, source = source)
+as_folk_task.data.table <- function(x, source = NULL, ...) {
+  structure(data.table::setDF(x), class = folk_task_class, source = source,
+            ...)
 }
 
 folk_df_class <- c("folk_df", "data.frame")
