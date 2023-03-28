@@ -8,6 +8,9 @@ alabama <- folk::get_acs(
 )
 
 set.seed(0)
-alabama <- alabama[sample(nrow(alabama), size = 5000), ]
 
-usethis::use_data(alabama, compress = "xz", overwrite = TRUE)
+usethis::use_data(
+  alabama[sample(nrow(alabama), size = 5000), ],
+  compress = "xz",
+  overwrite = TRUE
+)
