@@ -9,11 +9,35 @@
 [![codecov](https://codecov.io/gh/george-wood/folk/branch/master/graph/badge.svg?token=QXIN95S7AJ)](https://codecov.io/gh/george-wood/folk)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
+
+**Note: folk does not yet have a stable release. Use folk with due
+caution.**
+
+folk provides easy access to datasets that can be used to benchmark
+machine learning algorithms. The goal of folk is to facilitate and
+encourage work on fair machine learning among R users.
+
+The folk package has three key features:
+
+| Feature      | Description                                                                                                                                                                                                                                                                                 |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `get_()`     | The `get_()` functions provide easy access to data. Currently, there is only one `get_()` function, `get_acs()`, which provides access to the US Census Bureau’s American Community Survey (ACS) [Public Use Microdata Sample](https://www.census.gov/programs-surveys/acs/microdata.html). |
+| `set_task()` | The `set_task()` function preprocesses data for pre-defined prediction tasks. Pre-defined tasks can be viewed with `show_tasks()`.                                                                                                                                                          |
+| `new_task()` | The `new_task()` function allows users to create custom tasks. A custom task created via `new_task()` returns an object consistent with that returned by `set_task()`.                                                                                                                      |
+
+folk is inspired by the
+[folktables](https://github.com/socialfoundations/folktables) Python
+package. For more information on folktables see Ding, Hardt, Miller, and
+Schmidt (2022), [Retiring Adult: New Datasets for Fair Machine
+Learning](https://arxiv.org/pdf/2108.04884.pdf). The pre-defined
+prediction tasks for the American Community Survey data are
+implementations of the tasks introduced in this paper.
 
 ## Installation
 
-You can install the development version of folk from GitHub using:
+You can try the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -24,45 +48,114 @@ devtools::install_github("george-wood/folk")
 
 ``` r
 library(folk)
-
-al <- get_acs(state = "al", year = 2014, period = 1, survey = "p")
 ```
+
+- Easy access to data via folk’s API: `get_acs()`, …
 
 ``` r
-al_income <- set_task(al, task = "income")
-head(al_income)
-#>   PINCP AGEP COW SCHL MAR OCCP POBP RELP WKHP SEX RAC1P
-#> 1     0   49   6   16   1 7210    1    0   60   1     1
-#> 2     0   51   1   16   1 4220    1    0   40   1     1
-#> 3     0   53   1   16   1 7750    1    1   40   2     1
-#> 4     0   51   1   16   1 5610   19    0   40   1     1
-#> 5     1   48   5   20   1 7430   47    1   40   2     1
-#> 6     0   49   1   16   1 8620   53    0   45   1     1
+devtools::load_all()
+# optionally, set a path to write to
+delaware <- get_acs(state = "de", year = 2014, period = 1, survey = "person")
 ```
+
+- Show pre-defined prediction tasks for data accessed through the API:
+  `show_tasks()`
+
+``` r
+show_tasks(delaware)
+
+#> $income
+#> function(
+#>     features = c("AGEP",
+#>                  "COW",
+#>                  "SCHL",
+#>                  "MAR",
+#>                  "OCCP",
+#>                  "POBP",
+#>                  "RELP",
+#>                  "WKHP",
+#>                  "SEX",
+#>                  "RAC1P"),
+#>     target = "PINCP",
+#>     group = "RAC1P",
+#>     filter = filter_adult,
+#>     target_transform = function(y) binary_target_(y > 50000),
+#>     group_transform = NULL,
+#>     preprocess = NULL,
+#>     postprocess = function(x) replace_na_(x, value = -1L)
+#> ) {
+#>   invisible(FALSE)
+#> }
+#> 
+#> ...
+```
+
+- Set a pre-defined prediction task: `set_task()`
+
+``` r
+delaware_income <- set_task(delaware, task = "income")
+#> ℹ Setting income prediction task. See `]8;;ide:help:folk::task_incomefolk::task_income]8;;()` for details.
+head(delaware_income)
+#>   PINCP RAC1P AGEP COW SCHL MAR OCCP POBP RELP WKHP SEX
+#> 1     0     1   25   1   16   5 5400   17   16   40   2
+#> 2     0     1   37   1   21   1 3255   34    0   40   2
+#> 3     0     1   36   2   19   5  110   40    0   40   1
+#> 4     0     1   59   2   20   1 5120   54    0   40   2
+#> 5     0     1   21   1   19   5 5240   10    2   36   2
+#> 6     1     1   51   1   16   3 7150   24    0   40   1
+```
+
+## Example
 
 ``` r
 library(tidymodels)
 
+delaware <- get_acs(state = "de", year = 2014, period = 1, survey = "person")
+delaware_income <- set_task(delaware, task = "income")
+#> ℹ Setting income prediction task. See `folk::task_income()` for details.
+
 set.seed(0)
-al_split <- initial_split(al_income, prop = 0.8)
-al_train <- training(al_split)
-al_test <- testing(al_split)
+split <- initial_split(delaware_income, prop = 0.8)
+train <- training(split)
+test  <- testing(split)
 
-pred <-
-  logistic_reg() |>
-  set_engine("glm") |>
-  set_mode("classification") |>
-  fit(PINCP ~ ., data = al_train) |>
-  predict(new_data = al_test, type = "class")
+income_recipe <-
+  recipe(PINCP ~ ., data = train) |>
+  step_normalize()
 
-yhat <- as.numeric(as.character(pred$.pred_class))
+income_model <-
+  logistic_reg(mode = "classification", engine = "glm")
 
-white_tpr <- mean(yhat[(al_test$PINCP == 1) & (al_test$RAC1P == 1)])
-black_tpr <- mean(yhat[(al_test$PINCP == 1) & (al_test$RAC1P == 2)])
+income_flow <-
+  workflow() |>
+  add_recipe(income_recipe) |>
+  add_model(income_model)
 
-# equality of opportunity violation
-white_tpr - black_tpr
-#> [1] 0.2505592
+yhat <- 
+  fit(income_flow, data = train) |>
+  predict(new_data = test, type = "class")
+```
+
+``` r
+yhat <- as.numeric(as.character(yhat$.pred_class))
+black_tpr <- mean(yhat[test$PINCP == 1 & test$RAC1P == 2])
+black_fpr <- mean(yhat[test$PINCP == 0 & test$RAC1P == 2])
+white_tpr <- mean(yhat[test$PINCP == 1 & test$RAC1P == 1])
+white_fpr <- mean(yhat[test$PINCP == 0 & test$RAC1P == 1])
+
+black_tpr
+#> [1] 0.3414634
+black_fpr
+#> [1] 0.1025641
+
+white_tpr
+#> [1] 0.5992063
+white_fpr
+#> [1] 0.1648352
+
+# equalized odds difference:
+max(abs(black_tpr - white_tpr), abs(black_fpr - white_fpr))
+#> [1] 0.2577429
 ```
 
 ## Acknowledgements
