@@ -12,9 +12,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 <!-- badges: end -->
 
-**Note: folk does not yet have a stable release. Use folk with due
-caution.**
-
 folk provides easy access to datasets that can be used to benchmark
 machine learning algorithms. The goal of folk is to facilitate and
 encourage work on fair machine learning among R users.
@@ -94,7 +91,7 @@ show_tasks(delaware)
 
 ``` r
 delaware_income <- set_task(delaware, task = "income")
-#> ℹ Setting income prediction task. See `]8;;ide:help:folk::task_incomefolk::task_income]8;;()` for details.
+#> ℹ Setting income prediction task. See `folk::task_income()` for details.
 head(delaware_income)
 #>   PINCP RAC1P AGEP COW SCHL MAR OCCP POBP RELP WKHP SEX
 #> 1     0     1   25   1   16   5 5400   17   16   40   2

@@ -26,8 +26,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 <!-- badges: end -->
 
-**Note: folk does not yet have a stable release. Use folk with due caution.**
-
 folk provides easy access to datasets that can be used to benchmark
 machine learning algorithms. The goal of folk is to facilitate and encourage work on fair machine learning among R users.
 
