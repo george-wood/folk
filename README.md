@@ -24,17 +24,9 @@ The folk package has three key features:
 | `set_task()` | The `set_task()` function preprocesses data for pre-defined prediction tasks. Pre-defined tasks can be viewed with `show_tasks()`.                                                                                                                                                          |
 | `new_task()` | The `new_task()` function allows users to create custom tasks. A custom task created via `new_task()` returns an object consistent with that returned by `set_task()`.                                                                                                                      |
 
-folk is inspired by the
-[folktables](https://github.com/socialfoundations/folktables) Python
-package. For more information on folktables see Ding, Hardt, Miller, and
-Schmidt (2022), [Retiring Adult: New Datasets for Fair Machine
-Learning](https://arxiv.org/pdf/2108.04884.pdf). The pre-defined
-prediction tasks for the American Community Survey data are
-implementations of the tasks introduced in this paper.
-
 ## Installation
 
-You can try the development version from GitHub with:
+Install the development version from GitHub:
 
 ``` r
 # install.packages("devtools")
@@ -91,7 +83,7 @@ show_tasks(delaware)
 
 ``` r
 delaware_income <- set_task(delaware, task = "income")
-#> ℹ Setting income prediction task. See `folk::task_income()` for details.
+#> ℹ Setting income prediction task. See `folk::show_definition()()` for details.
 head(delaware_income)
 #>   PINCP RAC1P AGEP COW SCHL MAR OCCP POBP RELP WKHP SEX
 #> 1     0     1   25   1   16   5 5400   17   16   40   2
@@ -157,6 +149,10 @@ max(abs(black_tpr - white_tpr), abs(black_fpr - white_fpr))
 
 ## Acknowledgements
 
-- The folk package is inspired by the
-  [folktables](https://github.com/socialfoundations/folktables) Python
-  package.
+The folk package is inspired by the
+[folktables](https://github.com/socialfoundations/folktables) Python
+package. For more information on folktables see Ding, Hardt, Miller, and
+Schmidt (2022), [Retiring Adult: New Datasets for Fair Machine
+Learning](https://arxiv.org/pdf/2108.04884.pdf). The pre-defined
+prediction tasks for the American Community Survey data are
+implementations of the tasks introduced in this paper.

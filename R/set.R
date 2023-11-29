@@ -27,7 +27,7 @@ set_task.default <- function(data, task) {
 set_task_alert <- function(task) {
   cli::cli_alert_info(
     "Setting {.strong {task}} prediction task.
-    See {.fn folk::task_{task}} for details.",
+    See {.fn folk::show_definition()} for details.",
     wrap = TRUE
   )
 }
